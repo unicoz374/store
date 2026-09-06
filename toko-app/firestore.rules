@@ -1,0 +1,55 @@
+rules_version = '2';
+
+// ============================================================
+// FIRESTORE SECURITY RULES
+// ============================================================
+// Prinsip: SEMUA operasi tulis (write) dan operasi baca yang sensitif HANYA
+// boleh lewat server (Next.js API routes via Firebase Admin SDK), yang secara
+// otomatis melewati (bypass) rules ini. Rules di bawah ini murni mengatur apa
+// yang boleh diakses LANGSUNG oleh client SDK dari browser pengunjung.
+//
+// Karena seluruh halaman di proyek ini (etalase, detail produk, checkout,
+// riwayat, admin) sudah dibuat memakai Server Components / API routes dengan
+// Admin SDK — client SDK (firebase-client.ts) saat ini tidak dipakai untuk
+// baca-tulis langsung. Rules berikut sengaja dibuat SANGAT KETAT (deny-by-default)
+// sebagai jaring pengaman jika suatu saat ada kode client-side yang memanggil
+// Firestore langsung.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Produk: boleh dibaca publik (etalase), tulis hanya lewat Admin SDK (server)
+    match /produk/{produkId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // List/kategori: boleh dibaca publik, tulis hanya lewat Admin SDK
+    match /list/{listId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Stok: JANGAN PERNAH boleh dibaca langsung oleh client — berisi data
+    // terenkripsi yang hanya boleh didekripsi oleh server setelah validasi
+    // status order = paid (lihat /api/check-stock).
+    match /stok/{stokId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    // Orders: jangan izinkan baca/tulis langsung dari client. Semua akses
+    // (buat order, cek status, riwayat) wajib lewat API routes agar validasi
+    // kepemilikan device & status pembayaran tetap konsisten di server.
+    match /orders/{orderId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    // Settings (termasuk kredensial payment gateway): rahasia total, hanya server.
+    match /settings/{settingId} {
+      allow read: if false;
+      allow write: if false;
+    }
+  }
+}

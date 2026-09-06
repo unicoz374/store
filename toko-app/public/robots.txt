@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin-x9k2f/
+
+# PENTING: Ganti "admin-x9k2f" di atas sesuai nama folder admin Anda
+# setelah rename folder src/app/admin-x9k2f (lihat README bagian 6).
+# File ini hanya mencegah crawler PATUH (Google, Bing) mengindeks path admin —
+# bukan proteksi keamanan. Keamanan sesungguhnya tetap dari password + JWT session.
