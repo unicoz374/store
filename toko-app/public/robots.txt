@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin-22c484081cc4/
+
+# File ini hanya mencegah crawler PATUH (Google, Bing) mengindeks path admin —
+# bukan proteksi keamanan. Keamanan sesungguhnya tetap dari password + JWT session.
